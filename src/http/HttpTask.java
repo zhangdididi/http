@@ -32,7 +32,13 @@ public class HttpTask implements Runnable {
             //3. 刷新响应信息，返回给客户端
 
             //调整业务逻辑
-            //1. 根据url在WebApp文件夹下去找是否存在资源，存在就返回资源
+            //1. url为根路径
+            if ("/".equals(request.getUrl())) {
+                response.build200();
+                response.println("<h2>Http服务器首页</h2>");
+                return;
+            }
+            //2. 根据url在WebApp文件夹下去找是否存在资源，存在就返回资源
 
             //改造：读取项目中的Login.html文件内容，并返回给客户端
             //相对路径读取
@@ -48,19 +54,32 @@ public class HttpTask implements Runnable {
                 while ((content = br.readLine()) != null) {
                     response.println(content);
                 }
-                response.setStatusNum(200);
-                response.setMessage("ok");
+                response.build200();
             } else if ("/login".equals(request.getUrl())) {
-
+                //1. 只接受post方法，否则返回405
+                if (!"post".equalsIgnoreCase(request.getMethod())) {
+                    response.build405();
+                    response.println("不支持的请求方法：" + request.getMethod());
+                } else {
+                    //2. 校验用户名密码，校验通过返回（省略校验过程）
+                    response.build200();
+                    response.println("请求的数据：username=" + request.getParameter("username")
+                                        + ", password=" + request.getParameter("password"));
+                }
             } else {
                 //以上路径找不到，说明服务器不提供这个url服务，返回404
-                response.setStatusNum(404);
-                response.setMessage("Not Found");
-                System.out.println("找不到资源");
+                response.build404();
+                response.println("找不到资源");
             }
             response.flush();
         } catch (IOException e) {
+            //捕获所有异常，表示服务器异常，返回500
             e.printStackTrace();
+            response.build500();
+            System.out.println("服务器出错");
+        } finally {
+            //始终需要刷新相应数据给客户端
+            response.flush();
         }
     }
 }
