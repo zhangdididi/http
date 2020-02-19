@@ -82,6 +82,46 @@ public class Response {
     private Response() {
 
     }
+    
+        /**
+     * 构建200正常响应行
+     */
+    public void build200() {
+        statusNum = 200;
+        message = "OK";
+    }
+
+    /**
+     * 构建404找不到资源
+     */
+    public void build404() {
+        statusNum = 404;
+        message = "Not Found";
+    }
+
+    /**
+     * 构建307重定向
+     */
+    public void build307() {
+        statusNum = 307;// 301\302\307
+        message = "Send Redirect";
+    }
+
+    /**
+     * 构建405不支持的方法
+     */
+    public void build405() {
+        statusNum = 405;
+        message = "Method Not Allowed";
+    }
+
+    /**
+     * 构建500服务器错误
+     */
+    public void build500() {
+        statusNum = 500;
+        message = "Internal Server Error";
+    }
 
     public static Response buildResponse(OutputStream outputStream) {
         Response response = new Response();
